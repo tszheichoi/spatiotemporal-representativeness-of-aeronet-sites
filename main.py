@@ -18,14 +18,14 @@ spatial_contour_levels = list(np.arange(0.6, 1.0, 0.025)) + [0.99] # these are t
 
 temporal_lags = list(range(-60, 60)) # in minutes
 
-def determine_variability_at_site(site_name, season = 'ALL',json_dump_results = False):
+def determine_variability_at_site(site_name, season = 'ALL', json_dump_results = False):
 	"""
 	Determine the spatiotemporal variability of a given aeronet site
 
 	Input
 		site_name (str): name of aeronet site
 		season (str): one of ['ALL', 'DJF', 'MAM', 'JJA', 'SON']
-		json_dump_results (bool): whether or not to save the json out to results/
+		json_dump_results (bool): whether or not to save the json out to results
 	Return
 		results (dict): dictionary of spatial and temporal correlation results
 	"""
@@ -53,17 +53,9 @@ def determine_variability_at_site(site_name, season = 'ALL',json_dump_results = 
 	for mp in matched_paths:
 		year, month = mp[1], '{:02d}'.format(int(mp[2]))
 		year_month = year + month
-		if season == 'ALL':
+		if (season == 'ALL') or (season == season_converter[month]):
 			selected_paths[year_month] = mp[0]
-		elif season == 'DJF' and season_converter[month] == 'DJF':
-			selected_paths[year_month] = mp[0]
-		elif season == 'DJF' and season_converter[month] == 'DJF':
-			selected_paths[year_month] = mp[0]
-		elif season == 'DJF' and season_converter[month] == 'DJF':
-			selected_paths[year_month] = mp[0]
-		elif season == 'DJF' and season_converter[month] == 'DJF':
-			selected_paths[year_month] = mp[0]
-			
+
 	if len(selected_paths) == 0:
 		print(f'No ecmwf .nc files after sub-selecting by season {season}')
 
@@ -117,5 +109,6 @@ def determine_variability_at_site(site_name, season = 'ALL',json_dump_results = 
 	return site_characteristics
 
 if __name__ == "__main__":
-	results = determine_variability_at_site('Tamanrasset_TMP', json_dump_results = True)
-	go.Figure(visualise_spatiotemporal_correlation_results(results)).write_image('plots/Tamanrasset_TMP.png', scale = 2)
+	site = 'Tamanrasset_TMP'
+	results = determine_variability_at_site(site, json_dump_results = True)
+	go.Figure(visualise_spatiotemporal_correlation_results(results)).write_image(f'plots/{site}.png', scale = 2)
