@@ -1,0 +1,1 @@
+The raw data can be found at http://www.sp.ph.ic.ac.uk/~thc313/spatiotemporal/Spatiotemporal%20Representativeness%20of%20AERONET%20Sites/data/aeronet
