@@ -16,7 +16,7 @@ season_converter = {'12': 'DJF', '01': 'DJF', '02': 'DJF', '03': 'MAM', '04': 'M
 
 spatial_contour_levels = list(np.arange(0.6, 1.0, 0.025)) + [0.99] # these are the correlation levels at which we will compute the contour lines spatially
 
-temporal_lags = list(range(-60, 60)) # in minutes
+temporal_lags = list(range(-60, 60)) # in minutes
 
 def determine_variability_at_site(site_name, season = 'ALL', json_dump_results = False):
 	"""
@@ -33,7 +33,7 @@ def determine_variability_at_site(site_name, season = 'ALL', json_dump_results =
 
 	print(f'processing site: {site_name}')
 	site_characteristics = {'site_name': site_name}
-
+	
 	matched_paths = get_nc_files_recursively_with_starting_name('data/ecmwf', site_name)
 	if len(matched_paths) == 0:
 		print('Unable to find any corresponding ecmwf .nc files')
@@ -86,7 +86,7 @@ def determine_variability_at_site(site_name, season = 'ALL', json_dump_results =
 	
 	site_characteristics['contours'] = {}
 	for cs, threshold in zip(reversed(contours.collections), reversed(spatial_contour_levels)):
-		if len(cs.get_paths()) == 1: # closed path available
+		if len(cs.get_paths()) == 1: #closed path available
 			_lons, _lats = list(cs.get_paths()[0].vertices[:,0]), list(cs.get_paths()[0].vertices[:,1])
 			area = get_area_of_polygon(_lons, _lats)
 			if mplPath.Path(list(map(list, zip(*[_lons, _lats])))).contains_point((site_characteristics['site_lon'], site_characteristics['site_lat'])) or threshold == 0.99:
@@ -94,7 +94,7 @@ def determine_variability_at_site(site_name, season = 'ALL', json_dump_results =
 				site_characteristics['contours'][threshold] = {'lon': _lons, 'lat': _lats, 'area': area}
 			else: # path does not enclose the site, ignoring
 				pass
-		else: # clipped path, ignoring
+		else: #clipped path, ignoring
 			pass
 
 	print('determining temporal variability...')
