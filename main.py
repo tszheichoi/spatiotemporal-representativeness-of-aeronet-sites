@@ -9,7 +9,6 @@ import aeronet
 from scipy import stats
 import matplotlib.path as mplPath
 import json
-import pandas as pd
 import plotly.graph_objects as go
 from visualisation import visualise_spatiotemporal_correlation_results
 

@@ -1,17 +1,17 @@
 # 🗺️ Spatiotemporal Representativeness of AERONET Sites
 
-This is a collection of simple tools and results for quantitatively investigating the spatial and temporal representativeness of select AERONET sites. 
+This repository is a collection of simple tools and results for quantitatively investigating the spatial and temporal representativeness of select AERONET sites. Representativeness is quantified using cross-correlation and auto-correlation on the aerosol optical depth field and the AERONET observation time series, respectively. Please refer to the Background section for more information. 
 
 ### 🙏 Just Give Me the Results
-The main results are pre-computed and saved as convinient `.json` files. You can find these under `results/`. These are named after the AERONET site. There are also corresponding plots under `plots/` for each site. If you cannot find the site you are after, see below. For example, for the Tamanrasset TMP site, simply do:
+The main results are pre-computed and saved as convenient `.json` files. You can find these under `results/`. These are named after the AERONET site. There are also corresponding plots under `plots/` for each location. If you cannot find the site you are after, see below. For example, for the Tamanrasset TMP site, simply do:
 
 ```
 import json
-results = json.load(open('Tamanrasset_TMP.json'))
+results = json.load(open('results/Tamanrasset_TMP.json'))
 ```
 `results` is a dictionary with the following keys:
 
-- `site_name` is the name of the site.
+- `site_name` is the name of the AERONET site.
 - `site_lon` and `site_lat` are the coordinates of the AERONET site.
 - `num_of_matched_months` is the number of months of data that went into the correlation calculations. If this is less than 12, be careful about seasonal effects, as not the entire year has been taken into account. 
 - `contours` are the spatial bounds by correlation thresholds. This is a dictionary where the correlation thresholds (e.g. '0.99') are the keys. Accessing each key will give you another dictionary with `lon`, `lat` and `area` of the enclosing contour. The area is in m<sup>2</sup>. See the example section below. 
@@ -36,13 +36,13 @@ If you want to get the [shapely](https://shapely.readthedocs.io/en/stable/manual
 ```
 from shapely import geometry
 
-lon = results['contours']['0.99']['lon'] # note 0.99 is a str
+lon = results['contours']['0.99']['lon'] # note 0.99 is a str
 lat = results['contours']['0.99']['lat']
 
 polygon = geometry.Polygon(map(list, zip(*[lon, lat])))
 ```
 
-Then you can easily query whether any given longitude and latitude pair is within the bound or not. This is useful if you want to use these bounds to do dynamic co-location of satellite observations. 
+Then you can easily query whether any given longitude and latitude pair is within the bound or not. This is useful if you want to use these bounds to do dynamic colocation of satellite observations. 
 
 ```
 polygon.contains(geometry.Point(5.54, 22.773))
@@ -63,18 +63,18 @@ go.Figure(plot).show()
 ```
 
 ### ☀️ Which Sites Have Pre-Computed Results
-This work was created part of a larger peice of work on studying solar energy resources. As such, I was primarily interested in sites that are *sufficiently sunny*, defined as having at least 4 peak sun hours in direct normal irradiance (DNI). As of writing, there are 1198 AERONET sites in total, both historical and present. Only about 60% of them are situated within regions that receive at least 4 peak suyn hours. Notably, regions of tropical rainforest (Amazon and Congo basin), most of central and southeast Asia, and high latitude regions have been masked out by this selection criteria. If you want to study these excluded sites, you will have the get the raw data yourself and run the scripts from scratch unfortunately. 
+This work was created as part of a larger piece of work on studying solar energy resources. As such, I was primarily interested in sites that are *sufficiently sunny*, defined as having at least four peak sun hours in direct normal irradiance (DNI). As of writing, there are 1198 AERONET sites in total, both historical and present. Only about 60% of them are situated within regions that receive at least four peak sun hours. Notably, regions of tropical rainforest (Amazon and Congo basin), most of central and southeast Asia, and high latitude regions have been masked out by this selection criteria. If you want to study these excluded sites, you will have the get the raw data yourself and run the scripts from scratch, unfortunately. 
 
 ### 🤞 I Want to Reproduce the Results from Raw Data
 This repo contains everything you need to reproduce the `.json` files and, in principle, any AERONET site of interest. You will need the following data:
 
-- `data/aeronet/*.dat` AERONET observations, donloaded from https://aeronet.gsfc.nasa.gov/cgi-bin/draw_map_display_aod_v3
+- `data/aeronet/*.dat` AERONET observations, downloaded from https://aeronet.gsfc.nasa.gov/cgi-bin/draw_map_display_aod_v3
 - `data/ecmwf/*.nc` ECMWF MACC surface level total aerosol optical depth fields, 5 degrees by 5 degrees surrounding each of the AERONET sites. These are downloaded from https://apps.ecmwf.int/datasets/data/macc-reanalysis/levtype=sfc/ programmatically. See https://confluence.ecmwf.int/pages/viewpage.action?pageId=82870596#AccessMARS-apiclientlibrary for more information. 
 - `data/aeronet_metadata.csv` contains some metadata associated with each AERONET site. 
 
-The raw AERONET and ECMWF files are too large to be included in this repository. They can be downloaded at [http://www.sp.ph.ic.ac.uk/~thc313/spatiotemporal/.](http://www.sp.ph.ic.ac.uk/~thc313/spatiotemporal/Spatiotemporal%20Representativeness%20of%20AERONET%20Sites/)
+❗️ The raw AERONET and ECMWF files are too large to be included in this repository. They can be downloaded at [http://www.sp.ph.ic.ac.uk/~thc313/spatiotemporal/.](http://www.sp.ph.ic.ac.uk/~thc313/spatiotemporal/Spatiotemporal%20Representativeness%20of%20AERONET%20Sites/)
 
-To reproduce the results from one site, simply do:
+To reproduce the results from one site, simply do the following. Make sure you have all the dependencies from `environment.yml` as well. 
 
 ```
 from main import determine_variability_at_site
@@ -86,7 +86,7 @@ The `json_dump_results` key allows you to save the results as a `.json` under `r
 
 ### 🤔 Why is This Useful?
 
-To compare ground-based observations against the three aerosol products, they must first be co-located both in space and time due to the different sampling scales, resolutions and frequencies. Inappropriate up-scaling and down-scaling of observations in both space and time can be a source of significant error. This sampling error, also known as representation error ,  may easily amount to 30 to 160 % in instantaneous root mean square error. The standard approach is to match observations using fixed spatial and temporal thresholds centered at the site and at the overpass/re-analysis time, respectively. The thresholds, however, vary amongst the literature. 
+To compare ground-based observations against the three aerosol products, they must first be co-located both in space and time due to the different sampling scales, resolutions and frequencies. Inappropriate up-scaling and down-scaling of observations in both space and time can be a source of significant error. This sampling error, also known as representation error,  may easily amount to 30 to 160 % in instantaneous root mean square error. The standard approach is to match observations using fixed spatial and temporal thresholds centred at the site and at the overpass/re-analysis time, respectively. The thresholds, however, vary amongst the literature. 
 
 In order to improve the number of colocations, a novel site-dependent threshold is proposed. The idea is that sites with aerosol climatologies that are more spatially homogeneous and temporally stable will permit matches over a greater range in space and time. In other words, sites that are more spatially and temporally representative will have more relaxed thresholds. As such, what follows will be an exercise of quantifying the aerosol spatiotemporal representativeness of AERONET sites.
 
@@ -103,13 +103,13 @@ The eight sites in the figure are sorted by their spatial-representativeness, he
 ![](plots/spatiotemporal_correlation_for_all_sites.png)
 
 ### ⏱️ How is Temporal Representativeness Estimated
-For the quantification of temporal representativeness, a similar approach is adopted with the computation of the *auto*-correlation on the AERONET τ<sub>550</sub> time series. Auto-correlation assesses the self-similarity of a time series. Unlike cross-correlation where one considers the correlation of τ<sub>550</sub> against τ<sub>550</sub> at various distances away from the site, here one looks at the correlation of τ<sub>550</sub> against itself at various temporal lags. The auto-correlation is computed from zero-lag to 60-minute-lag, at one-minute resolution for the entire available τ<sub>550</sub> time series for each site. Sampling rates of AERONET τ<sub>550</sub> vary from site to site. While some sites attempt measurements only once every 15 minutes, most sites make measurements approximately every 3 minutes with a measurement sequence that is under a minute each. Therefore, one should only interpret auto-correlation that is at least 3 minutes in lag. 
+For quantifying temporal representativeness, a similar approach is adopted with the computation of the *auto*-correlation on the AERONET τ<sub>550</sub> time series. Auto-correlation assesses the self-similarity of a time series. Unlike cross-correlation where one considers the correlation of τ<sub>550</sub> against τ<sub>550</sub> at various distances away from the site, here one looks at the correlation of τ<sub>550</sub> against itself at various temporal lags. The auto-correlation is computed from zero-lag to 60-minute-lag, at one-minute resolution for the entire available τ<sub>550</sub> time series for each site. Sampling rates of AERONET τ<sub>550</sub> vary from site to site. While some sites attempt measurements only once every 15 minutes, most sites make measurements approximately every 3 minutes with a measurement sequence that is under a minute each. Therefore, one should only interpret auto-correlation that is at least 3 minutes in lag. 
 
-The results are shown in the bottom panels of figure above for each of the eight sites. At zero-lag, by definition, the auto-correlation is one. As increasingly greater temporal lags are considered, the auto-correlation fluctuates, but generally decreases with increasing lag. Note that positive and negative lags are symmetric by construction.
+The results are shown in the bottom panels of the figure above for each of the eight sites. At zero-lag, by definition, the auto-correlation is one. As increasingly greater temporal lags are considered, the auto-correlation fluctuates, but generally decreases with increasing lag. Note that positive and negative lags are symmetric by construction.
 
 From these curves, each site's temporal representativeness can be determined by examining the lag at which the auto-correlation first drops below a threshold. For instance, although Mount Chacaltaya is the least spatially representative amongst the eight sites in the figure, its temporal representativeness is one of the highest. Its auto-correlation first drops below 0.5 at a lag of 40 minutes. This indicates that the aerosol conditions over the valleys of Mount Chacaltaya are relatively stable, which is unsurprising given its elevation of over 5 km a.s.l.  On the other hand, Capo Verde, despite being the most spatially representative site amongst the eight, has its time series auto-correlation drop below 0.5 at a 3-minute-lag. This indicates generally higher aerosol temporal variability over the site.
 
 ### 🛰️ Representativeness as a Tool for Colocation
-Having established the spatial and temporal representativeness of each of the AERONET sites, it can now be exploited for the purpose of observation colocation. Instead of using a fixed area and temporal window for match searching, a set correlation threshold is specified. For spatial matching, any measurements falling within the set correlation contour will be considered a match in space. Similarly, for a given correlation threshold, one may seek the time lag at which the auto-correlation first falls below the said threshold. Any measurement falling within such ± time lag will be considered a match in time. In other words, dynamically varying spatial and temporal bounds are achieved, depending on each site's representativeness.
+Having established the spatial and temporal representativeness of each of the AERONET sites, it can now be exploited for the purpose of observation colocation. Instead of using a fixed area and temporal window for match searching, a set correlation threshold is specified. For spatial matching, any measurements falling within the selected correlation contour will be considered a match in space. Similarly, for a given correlation threshold, one may seek the time lag at which the auto-correlation first falls below the said threshold. Any measurement falling within such ± time lag will be considered a match in time. In other words, dynamically varying spatial and temporal bounds are achieved, depending on each site's representativeness.
 
 It has been decided that a 0.95 threshold for the spatial correlation and a 0.6 threshold for the temporal correlation should be used. In general, there are two extremes to consider. If the thresholds are too tight, there will be an insufficient sample size, and the statistics will be weak. On the other hand, if the thresholds are too relaxed, one risks `polluting' the dataset with measurements that are too far away in space and time, thus compromising the statistics as well. 
