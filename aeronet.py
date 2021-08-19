@@ -40,8 +40,8 @@ class AeronetMeasurements():
 		df = self.df.copy()
 		df['timeStamp'] = pd.to_datetime(df['timeStamp'])
 		df = df.set_index(['timeStamp'])
-		for wvl in [440, 443, 412, 400, 490]:
-			# _df = df[['AOD_%inm'%(wvl)]]
+		wvls_to_try = [440, 443, 412, 400, 490] 
+		for wvl in wvls_to_try:
 			_df = df[df['AOD_%inm'%(wvl)] != -999]
 			if not _df.empty:
 				print(f'using {wvl} nm for ecmwf')
@@ -54,3 +54,4 @@ class AeronetMeasurements():
 				return corr, 
 			else:
 				print(f'{wvl} nm is unavailable, trying another one...')
+		raise Exception(f'Tried all of {wvls_to_try} nm, but cannot find any corresponding observations at these channels')
