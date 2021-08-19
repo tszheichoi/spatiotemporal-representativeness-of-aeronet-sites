@@ -1,5 +1,7 @@
 def visualise_spatiotemporal_correlation_results(results):
-
+	'''
+	unpacks results and return a dictionary compatible with plotly plots
+	'''
 	spatial_plot = {'z': results['spatial_corr'], 'x': results['longitudes'], 'y': results['latitudes'], 'type': 'contour', 'xaxis': 'x1', 'yaxis': 'y1', 
 					'colorscale': 'plasma', 'zmax': 1, 'zmin': 0.5, 'colorbar': {'title': 'Corr', 'thickness': 10},
 					'showlegend': False, 'contours': {'showlabels': True, 'labelfont': {'size': 6, 'color': 'black'}}}

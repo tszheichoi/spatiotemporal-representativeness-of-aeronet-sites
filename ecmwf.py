@@ -21,13 +21,13 @@ class SurfaceAOD:
 		self.dimension = len(self.lon)
 
 	def get_spatial_index(self, lon, lat):
-		lonIndex = (np.abs(self.lon - lon)).argmin()
-		latIndex = (np.abs(self.lat - lat)).argmin()
-		return [lonIndex, latIndex]
+		lon_index = (np.abs(self.lon - lon)).argmin()
+		lat_index = (np.abs(self.lat - lat)).argmin()
+		return [lon_index, lat_index]
 
 	def get_aod_timeseries(self, wavelength, lon, lat):
-		[lonIndex, latIndex] = self.get_spatial_index(lon, lat)
+		[lon_index, lat_index] = self.get_spatial_index(lon, lat)
 		if int(wavelength) in self.aods.keys():
-			return self.aods[int(wavelength)][:, latIndex, lonIndex]
+			return self.aods[int(wavelength)][:, lat_index, lon_index]
 		else:
-			raise Exception('Cannot fetch timeseries directly at channels that are not directly provided by the IFS')
+			raise Exception('cannot fetch timeseries directly at channels that are not directly provided by the IFS')

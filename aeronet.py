@@ -16,22 +16,19 @@ class AeronetMeasurements():
 		return datetime.datetime.strptime(row['Date(dd:mm:yyyy)'] + ':' + row['Time(hh:mm:ss)'], '%d:%m:%Y:%H:%M:%S')
 
 	def __init__(self, site_name, wavelengthsWithDirectMeasurements = [440, 500, 675, 870, 1020], verbose = True):
-		assert all(i < j for i, j in zip(wavelengthsWithDirectMeasurements, wavelengthsWithDirectMeasurements[1:])) # assert strictly increasing
-		self.verbose = verbose
-		self.wavelengthsWithDirectMeasurements = wavelengthsWithDirectMeasurements
-		if self.verbose: print('reading AERONET ground based measurements...')
+		if verbose: print('reading AERONET ground based measurements...')
 		if (file_path := self._get_path_for_site(site_name)) is not None:
-			self.dataFrame = pd.read_csv(file_path, header = None, names = utils.aeronet_header)
+			self.df = pd.read_csv(file_path, header = None, names = utils.aeronet_header)
 			match = metadata_df[metadata_df['Site Name'] == site_name + ' '] # note the extra space!
 			assert not match.empty
 			self.longitude = float(match['Long'])
 			self.latitude = float(match['Lat'])
 		else:
-			print('Unable to find a match')
-			self.dataFrame = None
-		if self.dataFrame is not None:
-			self.dataFrame['timeStamp'] = self.dataFrame.apply(self.convert_to_datetime, axis = 'columns')
-			self.dataFrame['timeStamp'] = [datetime.datetime.utcfromtimestamp(t) for t in (self.dataFrame['timeStamp'] - np.datetime64('1970-01-01T00:00:00Z')) / np.timedelta64(1, 's')]
+			print('unable to find a match')
+			self.df = None
+		if self.df is not None:
+			self.df['timeStamp'] = self.df.apply(self.convert_to_datetime, axis = 'columns')
+			self.df['timeStamp'] = [datetime.datetime.utcfromtimestamp(t) for t in (self.df['timeStamp'] - np.datetime64('1970-01-01T00:00:00Z')) / np.timedelta64(1, 's')]
 
 	def _get_path_for_site(self, siteName):
 		path = AERONET_DATA_DIR + siteName + '.dat'
@@ -40,7 +37,7 @@ class AeronetMeasurements():
 			return path
 
 	def perform_autocorrection_analysis(self, lags = range(-60, 60)):
-		df = self.dataFrame.copy()
+		df = self.df.copy()
 		df['timeStamp'] = pd.to_datetime(df['timeStamp'])
 		df = df.set_index(['timeStamp'])
 		for wvl in [440, 443, 412, 400, 490]:

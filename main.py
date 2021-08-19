@@ -25,6 +25,9 @@ def determine_variability_at_site(site_name, season = 'ALL',json_dump_results = 
 	Input
 		site_name (str): name of aeronet site
 		season (str): one of ['ALL', 'DJF', 'MAM', 'JJA', 'SON']
+		json_dump_results (bool): whether or not to save the json out to results/
+	Return
+		results (dict): dictionary of spatial and temporal correlation results
 	"""
 	assert season in ['ALL', 'DJF', 'MAM', 'JJA', 'SON']
 
@@ -39,7 +42,7 @@ def determine_variability_at_site(site_name, season = 'ALL',json_dump_results = 
 
 	aeronet_obs = aeronet.AeronetMeasurements(site_name)
 	lon, lat = aeronet_obs.longitude, aeronet_obs.latitude
-	if aeronet_obs.dataFrame.empty: # unable to find a match
+	if aeronet_obs.df.empty: # unable to find a match
 		print('Unable to find any corresponding aeronet observation')
 		site_characteristics['success'] = False
 		return
